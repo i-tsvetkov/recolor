@@ -107,7 +107,7 @@ namespace ReColor {
         break;
 
         case COLOR_NAMES.test(color): {
-          let c = Color.getColorNamesObject()[color];
+          let c = Color.getColorNamesObject()[color.toLowerCase()];
           let channels = c.match(/[0-9A-F]{2}/gi)
                           .map(c => this.parseHex(c));
           this.r = channels[0];
