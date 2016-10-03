@@ -1,4 +1,4 @@
-/// <reference path="./recolor.ts" />
+/// <reference path="./color.ts" />
 /// <reference path="./get-style.ts" />
 
 namespace ReColor {
