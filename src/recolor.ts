@@ -32,7 +32,7 @@ namespace ReColor {
     let s = document.createElement('style');
     s.type = 'text/css';
 
-    document.head.appendChild(s);
+    document.body.appendChild(s);
     s.innerHTML = css;
 
     s.setAttribute('id', 'recolor');
