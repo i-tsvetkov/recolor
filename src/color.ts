@@ -114,6 +114,7 @@ namespace ReColor {
           this.g = channels[1];
           this.b = channels[2];
         }
+        break;
 
         case color == 'transparent':
           this.a = 0;
