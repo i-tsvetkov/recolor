@@ -33,8 +33,13 @@ function save() {
 }
 
 function restore() {
-  chrome.storage.sync.get({ colors: [] },
-                          item => item.colors.forEach(addColor));
+  chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS },
+                          item => {
+                            if (item.colors.length > 0)
+                              item.colors.forEach(addColor);
+                            else
+                              ReColor.CONFIG.MY_COLORS.forEach(addColor);
+                          });
 }
 
 document.getElementById('add').onclick = () =>
