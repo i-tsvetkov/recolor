@@ -122,6 +122,7 @@ namespace ReColor {
 
         default:
           this.valid = false;
+        break;
       }
     }
 
