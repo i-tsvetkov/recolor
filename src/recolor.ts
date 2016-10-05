@@ -32,6 +32,7 @@ namespace ReColor {
   }
 
   function addStyle(css : string) : void {
+    if (css.length == 0) return;
     let recolor = document.getElementById('recolor');
     if (!recolor) {
       recolor = document.createElement('div');

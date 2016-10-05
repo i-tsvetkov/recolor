@@ -23,10 +23,17 @@ namespace ReColor {
 
   export function getStyles(callback : Function) : void {
     let styles = [];
-    let asem = AsyncSemaphore(() => callback(styles));
+    let links  = [];
+    let callbackCss = () => {
+      styles = styles.concat( links.sort((x, y) => x.index - y.index).map(x => x.style) );
 
-    for (let s of toArray(document.querySelectorAll('style')))
-      styles.push(s.textContent);
+      for (let s of toArray(document.querySelectorAll('style')))
+        styles.push(s.textContent);
+
+      callback(styles);
+    };
+
+    let asem = AsyncSemaphore(callbackCss);
 
     for (let s of toArray(document.styleSheets)) {
       let css = "";
@@ -43,10 +50,11 @@ namespace ReColor {
     let linkTags = <NodeListOf<HTMLLinkElement>>document.querySelectorAll(linkSelector);
 
     if (linkTags.length == 0)
-      callback(styles);
+      callbackCss();
 
-    for (let l of toArray(linkTags))
-      getData(l.href, asem( s => styles.push(s) ));
+    for (let i = 0; i < linkTags.length; ++i)
+      getData(linkTags[i].href,
+              asem( (i => s => links.push({ style: s, index: i }))(i) ));
   }
 
   export function getData(url : string, fun : Function, method = 'GET', data = null) {
