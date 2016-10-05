@@ -45,7 +45,7 @@ namespace ReColor {
       getData(l.href, asem((s) => css += s));
   }
 
-  function getData(url : string, fun : Function, method = 'GET', data = null) {
+  export function getData(url : string, fun : Function, method = 'GET', data = null) {
     let xhr = new XMLHttpRequest();
     xhr.onload = () => fun(xhr.responseText);
     xhr.onreadystatechange = () => {
