@@ -21,28 +21,32 @@ namespace ReColor {
     return Array.prototype.slice.call(xs);
   }
 
-  export function getStyle(callback : Function) : void {
-    let css = "";
-    let asem = AsyncSemaphore(() => callback(css));
+  export function getStyles(callback : Function) : void {
+    let styles = [];
+    let asem = AsyncSemaphore(() => callback(styles));
 
     for (let s of toArray(document.querySelectorAll('style')))
-      css += s.textContent;
+      styles.push(s.textContent);
 
     for (let s of toArray(document.styleSheets)) {
+      let css = "";
+
       if (!s.cssRules)
         continue;
       for (let r of toArray(s.cssRules))
         css += r.cssText;
+
+      styles.push(css);
     }
 
     const linkSelector = 'link[href]:not([href=""])[type="text/css"],link[href]:not([href=""])[rel="stylesheet"]';
     let linkTags = <NodeListOf<HTMLLinkElement>>document.querySelectorAll(linkSelector);
 
     if (linkTags.length == 0)
-      callback(css);
+      callback(styles);
 
     for (let l of toArray(linkTags))
-      getData(l.href, asem((s) => css += s));
+      getData(l.href, asem( s => styles.push(s) ));
   }
 
   export function getData(url : string, fun : Function, method = 'GET', data = null) {

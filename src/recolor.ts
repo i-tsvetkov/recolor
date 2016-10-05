@@ -32,26 +32,30 @@ namespace ReColor {
   }
 
   function addStyle(css : string) : void {
+    let recolor = document.getElementById('recolor');
+    if (!recolor) {
+      recolor = document.createElement('div');
+      document.body.appendChild(recolor);
+      recolor.setAttribute('id', 'recolor');
+    }
+
     let s = document.createElement('style');
     s.type = 'text/css';
-
-    document.body.appendChild(s);
+    recolor.appendChild(s);
     s.innerHTML = css;
-
-    s.setAttribute('id', 'recolor');
   }
 
   export function main() : void {
-    getStyle((style) => addStyle(recolor(style)));
+    getStyles((styles) =>
+      styles.forEach(style =>
+        addStyle(recolor(style))));
   }
 
   export function addStyleTag(style : HTMLStyleElement) : void {
-    let re = document.getElementById('recolor');
-    re.textContent += recolor(style.textContent);
+    addStyle(recolor(style.textContent));
   }
 
   export function addLinkTag(link : HTMLLinkElement) : void {
-    let re = document.getElementById('recolor');
-    getData(link.href, s => re.textContent += recolor(s));
+    getData(link.href, s => addStyle(recolor(s)) );
   }
 }

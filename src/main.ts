@@ -13,7 +13,8 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
         let added = mutation.addedNodes;
         for (let i = 0; i < added.length; ++i) {
           if (added[i].nodeName == 'STYLE')
-            ReColor.addStyleTag(added[i] as HTMLStyleElement);
+            if ((<Element>added[i].parentNode).id != 'recolor')
+              ReColor.addStyleTag(added[i] as HTMLStyleElement);
           if (added[i].nodeName == 'LINK') {
             let link = added[i] as HTMLLinkElement;
             if (link.hasAttribute('href')
