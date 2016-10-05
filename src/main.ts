@@ -16,7 +16,9 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
             ReColor.addStyleTag(added[i] as HTMLStyleElement);
           if (added[i].nodeName == 'LINK') {
             let link = added[i] as HTMLLinkElement;
-            if (link.hasAttribute('href') && (link.type == 'text/css' || link.rel == 'stylesheet'))
+            if (link.hasAttribute('href')
+                && link.getAttribute('href') != ""
+                && (link.type == 'text/css' || link.rel == 'stylesheet'))
               ReColor.addLinkTag(link);
           }
         }

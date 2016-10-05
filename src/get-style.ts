@@ -35,7 +35,7 @@ namespace ReColor {
         css += r.cssText;
     }
 
-    const linkSelector = 'link[href][type="text/css"],link[href][rel="stylesheet"]';
+    const linkSelector = 'link[href]:not([href=""])[type="text/css"],link[href]:not([href=""])[rel="stylesheet"]';
     let linkTags = <NodeListOf<HTMLLinkElement>>document.querySelectorAll(linkSelector);
 
     if (linkTags.length == 0)
