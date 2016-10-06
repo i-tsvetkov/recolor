@@ -2,10 +2,10 @@
 <html>
   <head><title>ReColor Options</title></head>
   <body>
-    <input id="new-color" type="color">
+    <label>Choose Color:<input id="new-color" type="color" value="#8f00ff"></label>
     <button id="add">Add Color</button>
+    <button id="save">Save Colors</button>
     <ul id="colors"></ul>
-    <button id="save">Save</button>
     <style>
       .color-box {
         width:  20px;
@@ -15,10 +15,13 @@
         display: inline-block;
         vertical-align: middle;
       }
-      .remBtn {
+      #add, #save, #new-color, .remBtn {
         margin: 0 5px;
       }
       span { font-family: monospace; }
+      li { list-style-type: none; }
+      #save { float: right; }
+      #add, #save { vertical-align: bottom; }
     </style>
     <script src="config.js"></script>
     <script src="options.js"></script>

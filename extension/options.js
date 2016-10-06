@@ -16,7 +16,8 @@ function addColor(color) {
   li.appendChild(div);
   li.appendChild(span);
   li.appendChild(remBtn);
-  document.getElementById('colors').appendChild(li);
+  var list = document.getElementById('colors');
+  list.insertBefore(li, list.firstChild);
 }
 
 function removeColor(event) {
