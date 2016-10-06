@@ -37,9 +37,9 @@ function restore() {
   chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS },
                           item => {
                             if (item.colors.length > 0)
-                              item.colors.forEach(addColor);
+                              item.colors.sort().forEach(addColor);
                             else
-                              ReColor.CONFIG.MY_COLORS.forEach(addColor);
+                              ReColor.CONFIG.MY_COLORS.sort().forEach(addColor);
                           });
 }
 
