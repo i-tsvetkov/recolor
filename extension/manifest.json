@@ -1,7 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "recolor",
+  "name": "ReColor",
   "version": "0.1",
+  "description": "Allows you to change the colors used in any Web page with the colors you want.",
+  "icons": { "128": "paint-brush-icon.png" },
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
