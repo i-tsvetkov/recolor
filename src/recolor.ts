@@ -14,9 +14,76 @@ namespace ReColor {
 
   export declare const CONFIG : config;
 
+  const COLOR = '(#([0-9A-F]{3,4}){1,2}\\b)|(\\brgba?\\(.+?\\))|(\bhsla?\\(.+?\\))';
+  const COLOR_REGEX = new RegExp(`${COLOR}|(\\b(${Color.getColorNames().join("|")}|transparent)\\b)`, "i");
+
+  function parseCSS(css : string) {
+    let doc = document.implementation.createHTMLDocument('');
+    let style = document.createElement('style');
+    style.textContent = css;
+    doc.body.appendChild(style);
+    return (<any>style.sheet).cssRules;
+  }
+
+  function getColorRules(rs) {
+    return toArray(rs).map(getColorCSS)
+                      .filter(r => r.length > 0);
+  }
+
+  function getColorCSS(rule) : string {
+    const COLOR_PROPERTY_REGEX = /^(background(-color)?|color)$/;
+    const NOT_PROPERTY_REGEX = /\burl\(/;
+    let colorRules = [];
+
+    switch (rule.type) {
+      case CSSRule.MEDIA_RULE:
+        colorRules = getColorRules(rule.cssRules);
+        return (colorRules.length) ? `@media ${rule.media.mediaText} { ${colorRules.join("\n")} }` : "";
+      break;
+
+      case CSSRule.KEYFRAMES_RULE:
+      case CSSRule.SUPPORTS_RULE:
+        colorRules = getColorRules(rule.cssRules);
+        return (colorRules.length) ? `${rule.cssText.match(/^[^{]+/)} { ${colorRules.join("\n")} }` : "";
+      break;
+
+      case CSSRule.IMPORT_RULE:
+        return getColorRules(rule.styleSheet.cssRules).join("\n");
+      break;
+
+      default:
+        for (let i = 0; i < rule.style.length; ++i) {
+          let property = rule.style[i];
+          let value    = rule.style[property];
+          let priority = rule.style.getPropertyPriority(property);
+          priority = (priority.length > 0) ? "!" + priority : "";
+          if (COLOR_REGEX.test(value) || (COLOR_PROPERTY_REGEX.test(property)
+                                          && !NOT_PROPERTY_REGEX.test(value)))
+            colorRules.push(`${property}:${value}${priority};`);
+        }
+
+        if (colorRules.length > 0)
+          switch (rule.type) {
+            case CSSRule.STYLE_RULE:
+              return `${rule.selectorText} { ${colorRules.join("\n")} }`;
+            break;
+            case CSSRule.KEYFRAME_RULE:
+              return `${rule.keyText} { ${colorRules.join("\n")} }`;
+            break;
+            default:
+              return "";
+            break;
+          }
+        else
+          return "";
+      break;
+    }
+  }
+
   function recolor(css : string) : string {
-    const COLOR = '#([0-9A-F]{3,4}){1,2}\\b|\\brgba?\\(.+?\\)|\bhsla?\\(.+?\\)';
-    const COLOR_REGEX = new RegExp(`${COLOR}|\\b(${Color.getColorNames().join("|")})\\b`, "ig");
+    const COLOR_REGEX = new RegExp(`${COLOR}|(\\b(${Color.getColorNames().join("|")}|transparent)\\b)`, "ig");
+
+    css = getColorRules(parseCSS(css)).join("\n");
 
     let colors = css.match(COLOR_REGEX);
 

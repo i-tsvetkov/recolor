@@ -10,6 +10,11 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
     ReColor.main();
     let observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
+        if (mutation.type == 'characterData'
+            && mutation.target.parentNode.nodeName == 'STYLE'
+            && (<Element>mutation.target.parentNode.parentNode).id != 'recolor')
+          ReColor.addStyleTag(mutation.target.parentNode as HTMLStyleElement);
+
         let added = mutation.addedNodes;
         for (let i = 0; i < added.length; ++i) {
           if (added[i].nodeName == 'STYLE')
@@ -25,7 +30,9 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
         }
       });
     });
-    observer.observe(document, { subtree: true, childList: true });
+    observer.observe(document, { subtree: true,
+                                 childList: true,
+                                 characterData: true });
   }
 });
 

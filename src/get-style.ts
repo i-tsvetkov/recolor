@@ -13,11 +13,13 @@ namespace ReColor {
     };
   }
 
-  function toArray(xs : StyleSheetList) : CSSStyleSheet[];
-  function toArray(xs : CSSRuleList) : CSSRule[];
-  function toArray<T extends Element>(xs : NodeListOf<T>) : T[];
+  export function toArray(xs : StyleSheetList) : CSSStyleSheet[];
+  export function toArray(xs : CSSRuleList) : CSSRule[];
+  export function toArray<T extends Element>(xs : NodeListOf<T>) : T[];
 
-  function toArray(xs) {
+  export function toArray(xs : any) : any[];
+
+  export function toArray(xs) {
     return Array.prototype.slice.call(xs);
   }
 
