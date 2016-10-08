@@ -52,6 +52,8 @@ namespace ReColor {
       break;
 
       default:
+        if (!rule.style)
+          return "";
         for (let i = 0; i < rule.style.length; ++i) {
           let property = rule.style[i];
           let value    = rule.style[property];
@@ -80,7 +82,7 @@ namespace ReColor {
     }
   }
 
-  function recolor(css : string) : string {
+  export function recolor(css : string) : string {
     const COLOR_REGEX = new RegExp(`${COLOR}|(\\b(${Color.getColorNames().join("|")}|transparent)\\b)`, "ig");
 
     css = getColorRules(parseCSS(css)).join("\n");
@@ -125,5 +127,18 @@ namespace ReColor {
 
   export function addLinkTag(link : HTMLLinkElement) : void {
     getData(link.href, s => addStyle(recolor(s)) );
+  }
+
+  export function recolorStyle(e : Element) : void {
+    let style = e.getAttribute("style");
+    if (e.hasAttribute('recolor')) {
+      e.removeAttribute('recolor');
+      return;
+    }
+    if (!COLOR_REGEX.test(style))
+      return;
+    let newStyle = recolor(`_{${style}}`).replace(/^_\s*\{\s*|\s*\}$/g, "");
+    e.setAttribute('recolor', '');
+    e.setAttribute("style", `${style} ${newStyle}`);
   }
 }

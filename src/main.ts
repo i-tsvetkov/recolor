@@ -8,6 +8,10 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
   if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
   && !ReColor.CONFIG.URL_EXCLUDE_REGEX.test(document.URL)) {
     ReColor.main();
+
+    ReColor.toArray(document.querySelectorAll("[style]"))
+            .forEach(ReColor.recolorStyle);
+
     let observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {
         if (mutation.type == 'characterData'
@@ -33,6 +37,17 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
     observer.observe(document, { subtree: true,
                                  childList: true,
                                  characterData: true });
+
+/*
+    let styleObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation =>
+                          ReColor.recolorStyle(<Element>mutation.target));
+    });
+
+    styleObserver.observe(document, { subtree: true,
+                                      attributes: true,
+                                      attributeFilter: ["style"] });
+*/
   }
 });
 
