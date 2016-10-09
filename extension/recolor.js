@@ -448,6 +448,7 @@ var ReColor;
     function toArray(xs) {
         return Array.prototype.slice.call(xs);
     }
+    ReColor.toArray = toArray;
     function getStyles(callback) {
         var styles = [];
         var links = [];
@@ -503,9 +504,68 @@ var ReColor;
 /// <reference path="./get-style.ts" />
 var ReColor;
 (function (ReColor) {
+    var COLOR = '(#([0-9A-F]{3,4}){1,2}\\b)|(\\brgba?\\(.+?\\))|(\bhsla?\\(.+?\\))';
+    var COLOR_REGEX = new RegExp(COLOR + "|(\\b(" + ReColor.Color.getColorNames().join("|") + "|transparent)\\b)", "i");
+    function parseCSS(css) {
+        var doc = document.implementation.createHTMLDocument('');
+        var style = document.createElement('style');
+        style.textContent = css;
+        doc.body.appendChild(style);
+        return style.sheet.cssRules;
+    }
+    function getColorRules(rs) {
+        return ReColor.toArray(rs).map(getColorCSS)
+            .filter(function (r) { return r.length > 0; });
+    }
+    function getColorCSS(rule) {
+        var COLOR_PROPERTY_REGEX = /^(background(-color)?|color)$/;
+        var NOT_PROPERTY_REGEX = /\burl\(/;
+        var colorRules = [];
+        switch (rule.type) {
+            case CSSRule.MEDIA_RULE:
+                colorRules = getColorRules(rule.cssRules);
+                return (colorRules.length) ? "@media " + rule.media.mediaText + " { " + colorRules.join("\n") + " }" : "";
+                break;
+            case CSSRule.KEYFRAMES_RULE:
+            case CSSRule.SUPPORTS_RULE:
+                colorRules = getColorRules(rule.cssRules);
+                return (colorRules.length) ? rule.cssText.match(/^[^{]+/) + " { " + colorRules.join("\n") + " }" : "";
+                break;
+            case CSSRule.IMPORT_RULE:
+                return getColorRules(rule.styleSheet.cssRules).join("\n");
+                break;
+            default:
+                if (!rule.style)
+                    return "";
+                for (var i = 0; i < rule.style.length; ++i) {
+                    var property = rule.style[i];
+                    var value = rule.style[property];
+                    var priority = rule.style.getPropertyPriority(property);
+                    priority = (priority.length > 0) ? "!" + priority : "";
+                    if (COLOR_REGEX.test(value) || (COLOR_PROPERTY_REGEX.test(property)
+                        && !NOT_PROPERTY_REGEX.test(value)))
+                        colorRules.push(property + ":" + value + priority + ";");
+                }
+                if (colorRules.length > 0)
+                    switch (rule.type) {
+                        case CSSRule.STYLE_RULE:
+                            return rule.selectorText + " { " + colorRules.join("\n") + " }";
+                            break;
+                        case CSSRule.KEYFRAME_RULE:
+                            return rule.keyText + " { " + colorRules.join("\n") + " }";
+                            break;
+                        default:
+                            return "";
+                            break;
+                    }
+                else
+                    return "";
+                break;
+        }
+    }
     function recolor(css) {
-        var COLOR = '#([0-9A-F]{3,4}){1,2}\\b|\\brgba?\\(.+?\\)|\bhsla?\\(.+?\\)';
-        var COLOR_REGEX = new RegExp(COLOR + "|\\b(" + ReColor.Color.getColorNames().join("|") + ")\\b", "ig");
+        var COLOR_REGEX = new RegExp(COLOR + "|(\\b(" + ReColor.Color.getColorNames().join("|") + "|transparent)\\b)", "ig");
+        css = getColorRules(parseCSS(css)).join("\n");
         var colors = css.match(COLOR_REGEX);
         if (!colors)
             return '';
@@ -515,6 +575,7 @@ var ReColor;
             palette = ReColor.Color.swapColors(palette, ReColor.CONFIG.MY_SWAP_RULES);
         return css.replace(COLOR_REGEX, function (c) { return (palette[c]) ? palette[c] : c; });
     }
+    ReColor.recolor = recolor;
     function addStyle(css) {
         if (css.length == 0)
             return;
@@ -527,7 +588,7 @@ var ReColor;
         var s = document.createElement('style');
         s.type = 'text/css';
         recolor.appendChild(s);
-        s.innerHTML = css;
+        s.textContent = css;
     }
     function main() {
         ReColor.getStyles(function (styles) {
@@ -545,6 +606,19 @@ var ReColor;
         ReColor.getData(link.href, function (s) { return addStyle(recolor(s)); });
     }
     ReColor.addLinkTag = addLinkTag;
+    function recolorStyle(e) {
+        var style = e.getAttribute("style");
+        if (e.hasAttribute('recolor')) {
+            e.removeAttribute('recolor');
+            return;
+        }
+        if (!COLOR_REGEX.test(style))
+            return;
+        var newStyle = recolor("_{" + style + "}").replace(/^_\s*\{\s*|\s*\}$/g, "");
+        e.setAttribute('recolor', '');
+        e.setAttribute("style", style + " " + newStyle);
+    }
+    ReColor.recolorStyle = recolorStyle;
 })(ReColor || (ReColor = {}));
 /// <reference path="./recolor.ts" />
 chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, function (item) {
@@ -553,8 +627,14 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, function (item) {
     if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
         && !ReColor.CONFIG.URL_EXCLUDE_REGEX.test(document.URL)) {
         ReColor.main();
+        ReColor.toArray(document.querySelectorAll("[style]"))
+            .forEach(ReColor.recolorStyle);
         var observer = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
+                if (mutation.type == 'characterData'
+                    && mutation.target.parentNode.nodeName == 'STYLE'
+                    && mutation.target.parentNode.parentNode.id != 'recolor')
+                    ReColor.addStyleTag(mutation.target.parentNode);
                 var added = mutation.addedNodes;
                 for (var i = 0; i < added.length; ++i) {
                     if (added[i].nodeName == 'STYLE')
@@ -570,6 +650,8 @@ chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, function (item) {
                 }
             });
         });
-        observer.observe(document, { subtree: true, childList: true });
+        observer.observe(document, { subtree: true,
+            childList: true,
+            characterData: true });
     }
 });
