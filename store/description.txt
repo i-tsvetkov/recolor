@@ -1,5 +1,0 @@
-ReColor is an extension which allows you to replace the colors used by any web page with your favorite colors, by default the used colors are the Solarized palette by Ethan Schoonover, but they can easily be changed by the options.
-
-ReColor is definitely not perfect and there can be pages for which it does not work.
-If you think you have found a bug please report it here https://github.com/i-tsvetkov/recolor/.
-
