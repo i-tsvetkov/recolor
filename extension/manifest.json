@@ -3,18 +3,21 @@
   "name": "ReColor",
   "version": "0.1",
   "description": "Allows you to change the colors used in any Web page with the colors you want.",
-  "icons": { "128": "paint-brush-icon.png" },
+  "homepage_url": "https://github.com/i-tsvetkov/recolor",
+  "author": "Итало Цветков",
+  "icons": { "128": "128x128.png" },
   "options_ui": {
     "page": "options.html",
     "chrome_style": true
   },
   "permissions": [
     "storage",
-    "*://*/*"
+    "http://*/*",
+    "https://*/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
+      "matches": ["http://*/*", "https://*/*"],
       "js": ["config.js", "recolor.js"]
     }
   ]
