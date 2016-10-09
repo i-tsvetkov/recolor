@@ -112,7 +112,7 @@ namespace ReColor {
     let s = document.createElement('style');
     s.type = 'text/css';
     recolor.appendChild(s);
-    s.innerHTML = css;
+    s.textContent = css;
   }
 
   export function main() : void {
