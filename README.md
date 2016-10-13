@@ -1,6 +1,6 @@
 # ReColor
 Chrome extension which lets you recolor the Web with the colors you most love!  
-ReColor - allows you to change the colors used in any Web page with the colors you want.
+ReColor - allows you to change automatically the colors used in any Web page you visit with the colors you want.
 
 Example recoloring of google (the used colors are [solarized](http://ethanschoonover.com/solarized))
 
@@ -16,7 +16,8 @@ You could configure the extension colors through its options in the extensions p
 just don't forget to save them by clicking the save button.
 
 If you want more advanced configuration you have to load the extension in
-developer mode (from the directory `extension`) and then modify `config.js` as you wish.
+developer mode (from the directory `extension`) and then modify `config.js` as you wish
+and reload the extension.
 
 ## Known limitations
 The extension is definitely not perfect.
