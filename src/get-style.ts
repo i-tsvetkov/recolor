@@ -38,14 +38,19 @@ namespace ReColor {
     let asem = AsyncSemaphore(callbackCss);
 
     for (let s of toArray(document.styleSheets)) {
-      let css = "";
+      try {
+        let css = "";
 
-      if (!s.cssRules)
-        continue;
-      for (let r of toArray(s.cssRules))
-        css += r.cssText;
+        if (!s.cssRules)
+          continue;
+        for (let r of toArray(s.cssRules))
+          css += r.cssText;
 
-      styles.push(css);
+        styles.push(css);
+      }
+      catch (e) {
+        console.error(e);
+      }
     }
 
     const linkSelector = 'link[href]:not([href=""])[type="text/css"],link[href]:not([href=""])[rel="stylesheet"]';
