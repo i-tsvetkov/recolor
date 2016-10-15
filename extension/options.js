@@ -28,13 +28,13 @@ function save() {
   var colors = Array.from(document.querySelectorAll('#colors span'))
                     .map(it => it.textContent);
 
-  chrome.storage.sync.set({
+  chrome.storage.local.set({
     colors: colors
   });
 }
 
 function restore() {
-  chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS },
+  chrome.storage.local.get({ colors: ReColor.CONFIG.MY_COLORS },
                           item => {
                             if (item.colors.length > 0)
                               item.colors.sort().forEach(addColor);

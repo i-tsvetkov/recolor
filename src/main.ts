@@ -2,7 +2,7 @@
 
 declare let chrome : any;
 
-chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
+chrome.storage.local.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
   if (item.colors.length > 0)
     ReColor.CONFIG.MY_COLORS = item.colors;
   if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
