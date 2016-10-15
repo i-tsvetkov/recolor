@@ -37,17 +37,21 @@ namespace ReColor {
 
     switch (rule.type) {
       case CSSRule.MEDIA_RULE:
+      case 4:
         colorRules = getColorRules(rule.cssRules);
         return (colorRules.length) ? `@media ${rule.media.mediaText} { ${colorRules.join("\n")} }` : "";
       break;
 
       case CSSRule.KEYFRAMES_RULE:
+      case 7:
       case CSSRule.SUPPORTS_RULE:
+      case 12:
         colorRules = getColorRules(rule.cssRules);
         return (colorRules.length) ? `${rule.cssText.match(/^[^{]+/)} { ${colorRules.join("\n")} }` : "";
       break;
 
       case CSSRule.IMPORT_RULE:
+      case 3:
         return getColorRules(rule.styleSheet.cssRules).join("\n");
       break;
 
@@ -67,9 +71,11 @@ namespace ReColor {
         if (colorRules.length > 0)
           switch (rule.type) {
             case CSSRule.STYLE_RULE:
+            case 1:
               return `${rule.selectorText} { ${colorRules.join("\n")} }`;
             break;
             case CSSRule.KEYFRAME_RULE:
+            case 8:
               return `${rule.keyText} { ${colorRules.join("\n")} }`;
             break;
             default:
