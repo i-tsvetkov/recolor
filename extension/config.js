@@ -39,6 +39,12 @@ ReColor.CONFIG = {
   /* if the URL of the page matches this regex the swap of the colors will take effect */
   URL_SWAP_INCLUDE_REGEX: /$./,
   /* if the URL of the page matches this regex the swap of the colors will NOT take effect */
-  URL_SWAP_EXCLUDE_REGEX: /.*/
+  URL_SWAP_EXCLUDE_REGEX: /.*/,
+  /* if specified, function that transforms (maps) every color to a new one.
+   * the color is passed as an array of four numbers:
+   * [<red>, <green>, <blue>, <alpha>]
+   * the <red>, <green> and <blue> ranges from 0 to 255 and <alpha> ranges from 0 to 1
+   * the return color value should have the same format */
+  TRANSFORM_FUNCTION: null
 };
 

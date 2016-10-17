@@ -10,6 +10,7 @@ namespace ReColor {
     MY_SWAP_RULES : Object;
     URL_SWAP_INCLUDE_REGEX : RegExp;
     URL_SWAP_EXCLUDE_REGEX : RegExp;
+    TRANSFORM_FUNCTION : Function;
   }
 
   export declare const CONFIG : config;
@@ -97,6 +98,19 @@ namespace ReColor {
 
     if (!colors)
       return '';
+
+    if (CONFIG.TRANSFORM_FUNCTION) {
+      let cs = colors.map(c => ({ color: new Color(c), str: c }))
+                     .map(c => ({ str: c.str, rgba: [c.color.r,
+                                                     c.color.g,
+                                                     c.color.b,
+                                                     c.color.a] }));
+      let palette = {};
+      let color2str = c => `rgba(${c.join(",")})`;
+      cs.forEach(c =>
+        palette[c.str] = color2str(CONFIG.TRANSFORM_FUNCTION(c.rgba)));
+      return css.replace(COLOR_REGEX, (c) => (palette[c]) ? palette[c] : c);
+    }
 
     let palette = Color.transformPalette(colors, CONFIG.MY_COLORS);
     if (CONFIG.URL_SWAP_INCLUDE_REGEX.test(document.URL)
