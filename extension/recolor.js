@@ -463,14 +463,19 @@ var ReColor;
         var asem = AsyncSemaphore(callbackCss);
         for (var _i = 0, _a = toArray(document.styleSheets); _i < _a.length; _i++) {
             var s = _a[_i];
-            var css = "";
-            if (!s.cssRules)
-                continue;
-            for (var _b = 0, _c = toArray(s.cssRules); _b < _c.length; _b++) {
-                var r = _c[_b];
-                css += r.cssText;
+            try {
+                var css = "";
+                if (!s.cssRules)
+                    continue;
+                for (var _b = 0, _c = toArray(s.cssRules); _b < _c.length; _b++) {
+                    var r = _c[_b];
+                    css += r.cssText;
+                }
+                styles.push(css);
             }
-            styles.push(css);
+            catch (e) {
+                console.error(e);
+            }
         }
         var linkSelector = 'link[href]:not([href=""])[type="text/css"],link[href]:not([href=""])[rel="stylesheet"]';
         var linkTags = document.querySelectorAll(linkSelector);
@@ -523,15 +528,19 @@ var ReColor;
         var colorRules = [];
         switch (rule.type) {
             case CSSRule.MEDIA_RULE:
+            case 4:
                 colorRules = getColorRules(rule.cssRules);
                 return (colorRules.length) ? "@media " + rule.media.mediaText + " { " + colorRules.join("\n") + " }" : "";
                 break;
             case CSSRule.KEYFRAMES_RULE:
+            case 7:
             case CSSRule.SUPPORTS_RULE:
+            case 12:
                 colorRules = getColorRules(rule.cssRules);
                 return (colorRules.length) ? rule.cssText.match(/^[^{]+/) + " { " + colorRules.join("\n") + " }" : "";
                 break;
             case CSSRule.IMPORT_RULE:
+            case 3:
                 return getColorRules(rule.styleSheet.cssRules).join("\n");
                 break;
             default:
@@ -549,9 +558,11 @@ var ReColor;
                 if (colorRules.length > 0)
                     switch (rule.type) {
                         case CSSRule.STYLE_RULE:
+                        case 1:
                             return rule.selectorText + " { " + colorRules.join("\n") + " }";
                             break;
                         case CSSRule.KEYFRAME_RULE:
+                        case 8:
                             return rule.keyText + " { " + colorRules.join("\n") + " }";
                             break;
                         default:
@@ -569,6 +580,19 @@ var ReColor;
         var colors = css.match(COLOR_REGEX);
         if (!colors)
             return '';
+        if (ReColor.CONFIG.TRANSFORM_FUNCTION) {
+            var cs = colors.map(function (c) { return ({ color: new ReColor.Color(c), str: c }); })
+                .map(function (c) { return ({ str: c.str, rgba: [c.color.r,
+                    c.color.g,
+                    c.color.b,
+                    c.color.a] }); });
+            var palette_1 = {};
+            var color2str_1 = function (c) { return ("rgba(" + c.join(",") + ")"); };
+            cs.forEach(function (c) {
+                return palette_1[c.str] = color2str_1(ReColor.CONFIG.TRANSFORM_FUNCTION(c.rgba));
+            });
+            return css.replace(COLOR_REGEX, function (c) { return (palette_1[c]) ? palette_1[c] : c; });
+        }
         var palette = ReColor.Color.transformPalette(colors, ReColor.CONFIG.MY_COLORS);
         if (ReColor.CONFIG.URL_SWAP_INCLUDE_REGEX.test(document.URL)
             && !ReColor.CONFIG.URL_SWAP_EXCLUDE_REGEX.test(document.URL))
@@ -621,7 +645,7 @@ var ReColor;
     ReColor.recolorStyle = recolorStyle;
 })(ReColor || (ReColor = {}));
 /// <reference path="./recolor.ts" />
-chrome.storage.sync.get({ colors: ReColor.CONFIG.MY_COLORS }, function (item) {
+chrome.storage.local.get({ colors: ReColor.CONFIG.MY_COLORS }, function (item) {
     if (item.colors.length > 0)
         ReColor.CONFIG.MY_COLORS = item.colors;
     if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
