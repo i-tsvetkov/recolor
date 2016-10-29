@@ -2,9 +2,17 @@
 
 declare let chrome : any;
 
-chrome.storage.local.get({ colors: ReColor.CONFIG.MY_COLORS }, (item) => {
-  if (item.colors.length > 0)
-    ReColor.CONFIG.MY_COLORS = item.colors;
+chrome.storage.local.get({ config: ReColor.CONFIG }, (item) => {
+  ReColor.CONFIG = item.config;
+
+  ReColor.CONFIG.URL_INCLUDE_REGEX = new RegExp(item.config.URL_INCLUDE_REGEX);
+  ReColor.CONFIG.URL_EXCLUDE_REGEX = new RegExp(item.config.URL_EXCLUDE_REGEX);
+
+  ReColor.CONFIG.URL_SWAP_INCLUDE_REGEX = new RegExp(item.config.URL_SWAP_INCLUDE_REGEX);
+  ReColor.CONFIG.URL_SWAP_EXCLUDE_REGEX = new RegExp(item.config.URL_SWAP_EXCLUDE_REGEX);
+
+  ReColor.CONFIG.TRANSFORM_FUNCTION = eval(item.config.TRANSFORM_FUNCTION);
+
   if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
   && !ReColor.CONFIG.URL_EXCLUDE_REGEX.test(document.URL)) {
     ReColor.main();

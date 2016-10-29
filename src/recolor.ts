@@ -13,7 +13,7 @@ namespace ReColor {
     TRANSFORM_FUNCTION : Function;
   }
 
-  export declare const CONFIG : config;
+  export declare let CONFIG : config;
 
   const COLOR = '(#([0-9A-F]{3,4}){1,2}\\b)|(\\brgba?\\(.+?\\))|(\bhsla?\\(.+?\\))';
   const COLOR_REGEX = new RegExp(`${COLOR}|(\\b(${Color.getColorNames().join("|")}|transparent)\\b)`, "i");
