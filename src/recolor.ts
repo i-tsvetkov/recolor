@@ -18,6 +18,15 @@ namespace ReColor {
   const COLOR = '(#([0-9A-F]{3,4}){1,2}\\b)|(\\brgba?\\(.+?\\))|(\bhsla?\\(.+?\\))';
   const COLOR_REGEX = new RegExp(`${COLOR}|(\\b(${Color.getColorNames().join("|")}|transparent)\\b)`, "i");
 
+  export function isolateFunction(f : Function) {
+    let safeF = new Function('obj',
+                             'window',
+                             'document',
+                             '"use strict";'
+                             + `return (function() { return (${f.toString()}).apply({}, arguments); });`);
+    return safeF.bind({}, {}, {}, {})();
+  }
+
   function parseCSS(css : string) {
     let doc = document.implementation.createHTMLDocument('');
     let style = document.createElement('style');

@@ -11,7 +11,7 @@ chrome.storage.local.get({ config: ReColor.CONFIG }, (item) => {
   ReColor.CONFIG.URL_SWAP_INCLUDE_REGEX = new RegExp(item.config.URL_SWAP_INCLUDE_REGEX);
   ReColor.CONFIG.URL_SWAP_EXCLUDE_REGEX = new RegExp(item.config.URL_SWAP_EXCLUDE_REGEX);
 
-  ReColor.CONFIG.TRANSFORM_FUNCTION = eval(item.config.TRANSFORM_FUNCTION);
+  ReColor.CONFIG.TRANSFORM_FUNCTION = ReColor.isolateFunction(eval(item.config.TRANSFORM_FUNCTION));
 
   if (ReColor.CONFIG.URL_INCLUDE_REGEX.test(document.URL)
   && !ReColor.CONFIG.URL_EXCLUDE_REGEX.test(document.URL)) {
