@@ -53,7 +53,7 @@ namespace ReColor {
 
       case CSSRule.IMPORT_RULE:
       case 3:
-        return getColorRules(rule.styleSheet.cssRules).join("\n");
+        return rule.styleSheet.cssRules ? getColorRules(rule.styleSheet.cssRules).join("\n") : '';
       break;
 
       default:
